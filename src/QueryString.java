@@ -1,7 +1,8 @@
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.function.Predicate;
 
 public class QueryString {
 
@@ -9,10 +10,12 @@ public class QueryString {
     
     public QueryString(String query) {
         keyValues = new HashMap<>();
-        Arrays.asList(query.split("&")).stream().filter(s -> s.split("=").length > 1).forEach(s -> {
-            String[] split = s.split("=");
-            keyValues.put(split[0], split[1]);
-        });
+        List<String> pairs = Arrays.asList(query.split("&"));
+        pairs.stream().filter(onlyValidPairs()).forEach(pair -> keyValues.put(pair.split("=")[0], pair.split("=")[1]));
+    }
+
+    private Predicate<? super String> onlyValidPairs() {
+        return s -> s.split("=").length > 1;
     }
 
     public int count() {
